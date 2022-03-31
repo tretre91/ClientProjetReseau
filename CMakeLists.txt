@@ -20,5 +20,5 @@ CPMAddPackage(
   OPTIONS "FMT_DOC OFF" "FMT_TEST OFF"
 )
 
-add_executable(client src/main.cpp)
+add_executable(client src/main.cpp src/client.cpp)
 target_link_libraries(client PUBLIC bluetooth fmt::fmt pthread)

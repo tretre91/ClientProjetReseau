@@ -9,9 +9,17 @@ void send_loop(Client& client) {
     std::string message;
     ssize_t bytes_written = 0;
 
-    while (message != "stop" && bytes_written != -1) {
+    while (bytes_written != -1) {
         std::getline(std::cin, message);
-        bytes_written = client.send(message);
+        auto sep = message.find_first_of(' ');
+        if (message == "stop") {
+            client.send(message);
+            break;
+        } else if (message.substr(0, sep) == "username") {
+            client.set_username(message.substr(sep + 1));
+        } else {
+            bytes_written = client.send(message);
+        }
     }
 }
 

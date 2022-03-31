@@ -21,6 +21,14 @@ public:
 
     void disconnect();
 
+    void set_username(std::string_view name) {
+        m_username = name;
+    }
+
+    std::string_view get_username() const {
+        return m_username;
+    }
+
 private:
     static constexpr size_t buffer_size = 1024;
     std::atomic<int> m_socket = -1;

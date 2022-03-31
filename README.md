@@ -20,3 +20,4 @@ Pour lancer le client :
 
 Messages spéciaux :
 - `stop` : pour se déconnecter
+- `username nouveau_nom` : pour changer de nom d'utilisateur

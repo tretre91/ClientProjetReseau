@@ -11,7 +11,7 @@ ftxui::Component create_message(const std::string& message) {
     auto transform = [](const EntryState& state) {
         auto sep = state.label.find_first_of(' ');
         std::string author = state.label.substr(0, sep);
-        std::string message = state.label.substr(sep);
+        std::string message = state.label.substr(sep + 1);
 
         if (author == "moi") {
             return hbox({
@@ -39,7 +39,9 @@ ftxui::Component create_message(const std::string& message) {
 void receive_handler(Client& client, ftxui::ScreenInteractive& screen, ftxui::Component& messages) {
     std::string message;
     while (client.receive(message) && message != "stop") {
-        auto sep = message.find_first_of(' ');
+        if (auto sep = message.find_first_of(' '); sep == std::string::npos) {
+            message = fmt::format("Anonyme {}", message);
+        }
         messages->Add(create_message(message));
         screen.PostEvent(ftxui::Event::Custom);
     }

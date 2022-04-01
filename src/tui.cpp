@@ -11,15 +11,24 @@ ftxui::Component create_message(const std::string& message) {
     auto transform = [](const EntryState& state) {
         auto sep = state.label.find_first_of(' ');
         std::string author = state.label.substr(0, sep);
-        std::string&& message = state.label.substr(sep);
+        std::string message = state.label.substr(sep);
 
-        bool mine = author == "moi";
-        Element msg = window(text(std::move(author)) | bold | underlined, paragraph(message));
-        if (state.active) { msg |= inverted; }
-        if (mine) {
-            return hbox({ msg, filler() });
+        if (author == "moi") {
+            return hbox({
+                window(
+                    text(std::move(author)) | bold,
+                    paragraph(message)
+                ),
+                filler()
+            });
         } else {
-            return hbox({ filler(), msg });
+            return hbox({
+                filler(),
+                window(
+                    text(std::move(author)) | bold | align_right,
+                    paragraph(message)
+                )
+            });
         }
     };
     static MenuEntryOption option{transform, {}};

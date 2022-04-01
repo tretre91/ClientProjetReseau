@@ -1,3 +1,4 @@
+#include <fmt/color.h>
 #include <fmt/core.h>
 #include <iostream>
 #include <string>
@@ -29,7 +30,9 @@ int main(int argc, char** argv) {
         return 0;
     }
 
-    Client client(argv[1]);
+    Client client;
+    client.set_log(stderr);
+    client.connect(argv[1]);
 
     if (!client.is_connected()) {
         return -1;
@@ -46,10 +49,14 @@ int main(int argc, char** argv) {
 
         auto sep = message.find_first_of(' ');
         if (sep != std::string_view::npos) {
-            fmt::print("{}: {}\n", message.substr(0, sep), message.substr(sep + 1));
+            sender = message.substr(0, sep);
+            message = message.substr(sep + 1);
         } else {
-            fmt::print("Anonyme: {}\n", message);
+            sender = "Anonyme";
         }
+
+        fmt::print(fmt::emphasis::bold, "{} : ", sender);
+        fmt::print("{}\n", message);
     }
 
     thr.join();

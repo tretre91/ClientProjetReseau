@@ -41,8 +41,7 @@ private:
     static constexpr size_t buffer_size = 1024;
     std::atomic<int> m_socket = -1;
     std::string m_username;
-    std::string send_buffer;
-    bool should_close_log = true;
+    bool m_should_close_log = true;
     FILE* m_log;
 
     void close_log();

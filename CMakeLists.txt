@@ -29,13 +29,8 @@ CPMAddPackage(
   EXCLUDE_FROM_ALL
 )
 
-if (ftxui_ADDED)
-  add_library(ftxui INTERFACE)
-  target_link_libraries(ftxui INTERFACE ftxui::screen ftxui::dom ftxui::component)
-endif()
-
-add_executable(client src/main.cpp src/client.cpp)
+add_executable(client src/cli.cpp src/client.cpp)
 target_link_libraries(client PUBLIC bluetooth fmt::fmt pthread)
 
-add_executable(tui-client tui-client/main.cpp src/client.cpp)
-target_link_libraries(tui-client PUBLIC bluetooth fmt::fmt ftxui pthread)
+add_executable(tui-client src/tui.cpp src/client.cpp)
+target_link_libraries(tui-client PUBLIC bluetooth fmt::fmt ftxui::screen ftxui::dom ftxui::component pthread)

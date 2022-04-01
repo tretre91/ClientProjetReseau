@@ -1,7 +1,6 @@
 #include "../src/client.hpp"
 
 #include <ftxui/dom/elements.hpp>
-#include <ftxui/screen/screen.hpp>
 #include <ftxui/component/component.hpp>
 #include <ftxui/component/screen_interactive.hpp>
 #include <string>
@@ -9,25 +8,21 @@
 
 ftxui::Component create_message(const std::string& message) {
     using namespace ftxui;
-    auto init = []() {
-        MenuEntryOption opt;
-        opt.transform = [](const EntryState& state) {
-            auto sep = state.label.find_first_of(' ');
-            std::string author = state.label.substr(0, sep);
-            std::string&& message = state.label.substr(sep);
+    auto transform = [](const EntryState& state) {
+        auto sep = state.label.find_first_of(' ');
+        std::string author = state.label.substr(0, sep);
+        std::string&& message = state.label.substr(sep);
 
-            bool mine = author == "moi";
-            Element msg = window(text(std::move(author)) | bold | underlined, paragraph(message));
-            if (state.active) { msg |= inverted; }
-            if (mine) {
-                return hbox({ msg, filler() });
-            } else {
-                return hbox({ filler(), msg });
-            }
-        };
-        return opt;
+        bool mine = author == "moi";
+        Element msg = window(text(std::move(author)) | bold | underlined, paragraph(message));
+        if (state.active) { msg |= inverted; }
+        if (mine) {
+            return hbox({ msg, filler() });
+        } else {
+            return hbox({ filler(), msg });
+        }
     };
-    static MenuEntryOption option = init();
+    static MenuEntryOption option{transform, {}};
 
     return MenuEntry(message, option);
 }
@@ -70,7 +65,6 @@ int main(int argc, char* argv[]) {
     int selected = 0;
     auto messages = Container::Vertical({}, &selected);
     std::string error_message;
-    bool show_error = false;
 
     auto disconnect = [&]() {
         if (client.is_connected()) {
@@ -82,16 +76,17 @@ int main(int argc, char* argv[]) {
 
     auto connect = [&](std::string_view server_address) {
         disconnect();
+        error_message = "Tentative de connexion ...";
+        screen.PostEvent(Event::Custom);
         if (client.connect(server_address)) {
             receiver = std::thread(receive_handler, std::ref(client), std::ref(screen), std::ref(messages));
-            show_error = false;
+            error_message.clear();
         } else {
             error_message = "Echec de la connexion";
-            show_error = true;
         }
     };
 
-    auto error = Maybe(Renderer([&](){ return paragraph(error_message) | color(Color::Red1) | border; }), &show_error);
+    auto error = Maybe(Renderer([&](){ return paragraph(error_message) | color(Color::Red1); }), [&](){ return !error_message.empty(); });
 
     std::string message;
     InputOption option;
@@ -101,8 +96,7 @@ int main(int argc, char* argv[]) {
         }
         message = "";
     };
-
-    auto message_input = Input(&message, "Tapez un message ...", option);
+    auto message_input = Input(&message, "> ", option);
 
     std::string server_address;
     auto server_input = Input(&server_address, "");

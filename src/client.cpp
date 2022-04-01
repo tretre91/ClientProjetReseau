@@ -28,7 +28,7 @@ Client::~Client() {
 bool Client::set_log(std::string_view filename) {
     close_log();
     m_log = fopen(filename.data(), "w");
-    should_close_log = true;
+    m_should_close_log = true;
     if (m_log == nullptr) {
         m_log = fopen("/dev/null", "w");
         return false;
@@ -40,7 +40,7 @@ bool Client::set_log(std::string_view filename) {
 bool Client::set_log(FILE* f) {
     close_log();
     m_log = f;
-    should_close_log = false;
+    m_should_close_log = false;
     return true;
 }
 
@@ -49,7 +49,7 @@ void Client::log(std::string_view s) {
 }
 
 void Client::close_log() {
-    if (should_close_log) {
+    if (m_should_close_log) {
         fclose(m_log);
     }
 }
@@ -67,7 +67,7 @@ bool Client::receive(std::string& buffer) {
         buffer.resize(size);
         return true;
     } else if (size == 0) {
-        fmt::print(m_log, "OOF\n");
+        fmt::print(m_log, "Fermeture du socket en lecture\n");
         return false;
     } else {
         fmt::print(m_log, "Echec lors de la reception d'un message\n");
@@ -76,6 +76,7 @@ bool Client::receive(std::string& buffer) {
 }
 
 bool Client::send(std::string_view message) {
+    static std::string send_buffer;
     send_buffer = fmt::format("{} {}", m_username, message);
     ssize_t size = ::send(m_socket, send_buffer.data(), send_buffer.size(), 0);
     if (size < 0) {

@@ -49,6 +49,8 @@ int main(int argc, char** argv) {
 
     switch (argc) {
     case 1: // ./client
+        fmt::print("Recherche d'un serveur, peut prendre quelques secondes ...\n");
+        fflush(stdout);
         client.auto_connect();
         break;
     case 2: // ./client "address"

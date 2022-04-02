@@ -44,14 +44,20 @@ void send_loop(Client& client) {
 }
 
 int main(int argc, char** argv) {
-    if (argc < 2) {
-        fmt::print("Usage : {} <adresse>\n", argv[0]);
-        return 0;
-    }
-
     Client client;
     client.set_log(stderr);
-    client.connect(argv[1]);
+
+    switch (argc) {
+    case 1: // ./client
+        client.auto_connect();
+        break;
+    case 2: // ./client "address"
+        client.connect(argv[1]);
+        break;
+    default: // ./client "address" port
+        client.connect(argv[1], std::atoi(argv[2]));
+        break;
+    }
 
     if (!client.is_connected()) {
         return -1;

@@ -15,13 +15,21 @@ make tui-client # pour le client graphique
 
 ## Usage
 
-### Client simple
+### Client simple (stable)
 
-Pour lancer le client :
+Pour lancer le client et se connecter au premier serveur disponible :
+
+```bash
+./client
+```
+
+Pour se connecter à un serveur en particulier :
 
 ```bash
 ./client adresse_du_serveur
 ```
+
+on peut également spécifier le canal utilisé avec un 2ème argument.
 
 Messages spéciaux :
 - `stop` : pour se déconnecter

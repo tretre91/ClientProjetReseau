@@ -2,3 +2,5 @@
 build/
 
 .rsync-exclude
+CMakeLists.txt.user
+

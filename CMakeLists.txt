@@ -7,6 +7,8 @@ project(
   DESCRIPTION ""
 )
 
+option(GUI_CLIENT "build la gui qt" OFF)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
@@ -34,3 +36,7 @@ target_link_libraries(client PUBLIC bluetooth fmt::fmt pthread)
 
 add_executable(tui-client src/tui.cpp src/client.cpp)
 target_link_libraries(tui-client PUBLIC bluetooth fmt::fmt ftxui::screen ftxui::dom ftxui::component pthread)
+
+if (GUI_CLIENT)
+  add_subdirectory(gui)
+endif()

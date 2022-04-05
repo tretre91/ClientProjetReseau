@@ -14,6 +14,9 @@ QT_BEGIN_NAMESPACE
 namespace Ui { class ClientGui; }
 QT_END_NAMESPACE
 
+/**
+ * @brief Classe principale de l'interface graphique
+ */
 class ClientGui : public QMainWindow
 {
     Q_OBJECT
@@ -22,6 +25,9 @@ public:
     ClientGui(QWidget *parent = nullptr);
     ~ClientGui();
 
+    /**
+     * @brief Démarre la recherche de serveurs
+     */
     void startServiceDiscovery();
 
 private:
@@ -33,6 +39,9 @@ private:
     QBluetoothServiceDiscoveryAgent* m_discoveryAgent;
     Client m_client;
 
+    /**
+     * @brief Modifie le nom d'utilisateur
+     */
     void setUsername(const QString& username);
 
     static QString createMessage(QString sender, QString message) {
@@ -40,13 +49,30 @@ private:
     }
 
 signals:
+    /**
+     * @brief Signal émis lorsque des données doivent être envoyées
+     */
     void sendData(QString);
 
 private slots:
+    /**
+     * @brief Fonction appelée lorsqu'un service à été trouvé sur un appareil à proximité
+     */
     void serviceDiscovered(const QBluetoothServiceInfo& service);
+
+    /**
+     * @brief Fonction appelée lorsque la recherche de services est terminée
+     */
     void discoveryFinished();
 
+    /**
+     * @brief Envoie un message vers le serveur
+     */
     void send(QString);
+
+    /**
+     * @brief Reçoit un message du serveur
+     */
     void receive(QString, QString);
 
     void connected();
@@ -60,6 +86,9 @@ private slots:
     void serverSelectionChanged(QTableWidgetItem* current, QTableWidgetItem* previous);
 };
 
+/**
+ * @brief Classe utilisée pour attendre des données depuis le serveur
+ */
 class ClientGui::Receiver : public QThread {
     Q_OBJECT
 public:
@@ -84,6 +113,9 @@ public:
     }
 
 signals:
+    /**
+     * @brief Signal indiquant que des données ont été reçues
+     */
     void receivedData(QString, QString);
 private:
     Client* m_client = nullptr;

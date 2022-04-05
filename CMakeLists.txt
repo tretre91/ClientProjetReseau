@@ -7,7 +7,8 @@ project(
   DESCRIPTION ""
 )
 
-option(GUI_CLIENT "build la gui qt" OFF)
+option(GUI_CLIENT "build l'interface graphique Qt" OFF)
+option(QT_DIR "le dossier d'installation de Qt" "~/Qt/5.15.2/gcc_64")
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)

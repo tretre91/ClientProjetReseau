@@ -158,10 +158,11 @@ std::vector<Server> Client::search_servers(unsigned int limit) {
         return {};
     }
 
+    // on limite la recherche à 255 appareils
     int max_rsp = 255;
     inquiry_info* inquiries = new inquiry_info[max_rsp];
 
-    // device id, timeout (* 1.28), nb max de resulats
+    // On cherche les appareils à proximité
     int num_rsp = hci_inquiry(dev_id, 8, max_rsp, nullptr, &inquiries, IREQ_CACHE_FLUSH);
     if (num_rsp < 0) {
         fmt::print(m_log, "Echec de la requete sdp ({})\n", strerror(errno));
@@ -186,6 +187,7 @@ std::vector<Server> Client::search_servers(unsigned int limit) {
 
     std::vector<Server> devices;
 
+    // on cherche parmi les appareils trouvés tant qu'on a pas atteint la limite de serveurs à chercher
     for (int i = 0; i < num_rsp && devices.size() < limit; i++) {
         target = &(inquiries[i].bdaddr);
 
@@ -207,12 +209,14 @@ std::vector<Server> Client::search_servers(unsigned int limit) {
 
         port = 0;
         response_list = 0;
+        // recherche du service défini par notre serveur parmi les services de l'appareil
         if (sdp_service_search_attr_req(session, search_list, SDP_ATTR_REQ_RANGE, attrid_list, &response_list) == 0) {
             sdp_list_t* proto_list;
             sdp_list_t* r = response_list;
 
             for (; r; r = r->next) {
                 sdp_record_t* rec = (sdp_record_t*)r->data;
+                // on cherche le n° de canal RFCOMM
                 if (sdp_get_access_protos(rec, &proto_list) == 0) {
                     port = sdp_get_proto_port(proto_list, RFCOMM_UUID);
                     fmt::print(m_log, "- canal {}\n", port);
@@ -226,6 +230,7 @@ std::vector<Server> Client::search_servers(unsigned int limit) {
         response_list = nullptr;
         sdp_close(session);
 
+        // si on a trouvé notre service, on ajoute le serveur à la liste de serveurs
         if (port != 0) {
             Server serv;
             serv.name = name;
@@ -235,6 +240,7 @@ std::vector<Server> Client::search_servers(unsigned int limit) {
         }
     }
 
+    // libération de ressources
     sdp_list_free(search_list, 0);
     sdp_list_free(attrid_list, 0);
 

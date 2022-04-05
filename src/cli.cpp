@@ -12,8 +12,10 @@
 // permet de notifier le thread qui attend l'input sur stdin
 int event_fd = eventfd(0, 0);
 
-// bloque jusqu'a ce qu'il y ait des données dispo sur stdin
-// renvoie true si des données sont dispo, false si event_fd a ete notifie
+/**
+ * @brief bloque jusqu'a ce qu'il y ait des données dispo sur stdin
+ * @return true si des données sont dispo, false si event_fd a ete notifie
+ */
 bool wait_stdin() {
     static pollfd pfds[2] = {
         {fileno(stdin), POLLIN, 0},
@@ -25,6 +27,10 @@ bool wait_stdin() {
     return pfds[0].revents & POLLIN;
 }
 
+/**
+ * @brief Attends des données sur l'entrée standard, et les envoie au serveur
+ * @param client une réference vers un objet Client
+ */
 void send_loop(Client& client) {
     std::string message;
     ssize_t bytes_written = 0;
